@@ -88,4 +88,24 @@ public class GenericDAO {
 		pstmt.close();
 		conexao.close();
 	}
+
+	public ResultSet select(String querySql, Object... parametros) throws SQLException {
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+	
+		try {
+			pstmt = getConnection().prepareStatement(querySql);
+	
+			for (int i = 0; i < parametros.length; i++) {
+				pstmt.setObject(i + 1, parametros[i]);
+			}
+	
+			rs = pstmt.executeQuery();
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw e;
+		}
+		return rs; 
+	}
+	
 }

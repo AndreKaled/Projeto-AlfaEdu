@@ -1,6 +1,7 @@
 package bloco_de_notas;
 
 import database.GenericDAO;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class NotasController{
@@ -24,16 +25,42 @@ public class NotasController{
     }
 
     public void remAnotacao(Anotacao anotacao){
-        String command = "DELETE * FROM Anotacao WHERE id = " +anotacao.getIdAnotacao();
+        String command = "DELETE FROM Anotacao WHERE idAnotacao = " +anotacao.getIdAnotacao();
         try{
             dao.delete(command);
             bloco.removeAnotacao(anotacao);
-        }catch(SQLException){
-//here
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+    }
+    public void altAnotacao(Anotacao anotacao){
+        String command = "UPDATE Anotacao SET texto = ? WHERE idAnotacao = ?";
+        try {
+            dao.update(command, anotacao.getIdAnotacao(), anotacao.getTexto());
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
     }
 
-    public boolean atualizaBanco(){
+    public boolean atualizaDados(){
+        String command = "SELECT * FROM Anotacao";
+        try {
+            ResultSet result = dao.select(command);
+            bloco.getAnotacoes().clear();
+            while(result.next()){
+                Anotacao a = new Anotacao();
+                a.setIdAnotacao(result.getInt(1));
+                a.setDataCriacao(result.getDate(2));
+                a.setTexto(result.getString(3));
+                bloco.adicionaAnotacao(a);
+            }
+            return true;
+        } catch (Exception e) {
+            // TODO: handle exception
+            e.printStackTrace();
+        }
         return false;
     }
+
+    
 }
